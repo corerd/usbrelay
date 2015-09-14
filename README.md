@@ -1,6 +1,7 @@
 ![alt text](usbrelay.jpg "USB Relay")
 
-USB Relay driver for linux
+USB Relay driver for Linux, Mac OS X and Windows
+================================================
 
 A cheap USB relay available from Ebay has either single or dual relay output.
 The double throw relay ratings are 10A 250VAC each.
@@ -76,6 +77,7 @@ Device Status:     0x0000
   (Bus Powered)
 ```
 HIDAPI
+======
 
 http://www.signal11.us/oss/hidapi
 
@@ -86,8 +88,34 @@ Protocol:
 The relay modules does not set the USB serial number but has a unique serial when the HID device is queried, the current state of the relays is also sent with the serial.
 The HID serial is matched and the ON/OFF command is sent to the chosen relay.
 
-Building the code:
-Assuming the hidapi and hidapi-devel packages have been installed. Note that there are two options for the hidapi library: hidapi-hidraw or hidapi-libusb. Different distributions have better results with one or the other. YMMV.
+
+Build Instructions
+===================
+
+Prerequisites
+-------------
+
+You will need to install development packages for libhidapi.
+
+On Windows, checkout hidapi sources from the official repository:
+
+https://github.com/signal11/hidapi
+
+From the above link. follow the instructions to build the hidapi dll.
+
+For your convenience, you can find the hidapi library binaries in this repo
+in the `windows/hidapi` directory.
+
+
+Linux
+-----
+
+On Debian/Ubuntu systems, development packages for libhidapi can be installed by running:
+```
+sudo apt-get install libhidapi-dev libhidapi-hidraw0 libhidapi-libusb0
+```
+
+There are two options for the hidapi library: hidapi-hidraw or hidapi-libusb. Different distributions have better results with one or the other. YMMV.
 
 ```
 ### hidapi-hidraw 
@@ -95,15 +123,49 @@ Assuming the hidapi and hidapi-devel packages have been installed. Note that the
 ### hidapi-libusb
 # gcc -o usbrelay usbrelay.c -lhidapi-libusb
 ```
-Usage:
-The code needs to access the device. This can be achieved either by running the program with root privileges (so sudo is your friend) or by putting
+
+
+Mac OS X
+--------
+
+On Mac OS X, development packages for libhidapi can be installed by running:
+```
+sudo brew install hidapi
+```
+
+Compile the program entering the following command:
+```
+# gcc -o usbrelay usbrelay.c -lhidapi
+```
+
+
+Windows
+-------
+
+Use Visual Studio to build the .sln file in the `windows/usbrelay-vs` directory.
+
+
+Usage
+=====
+
+As already stated, the program is command line only.
+
+On Linux, the code needs to access the device. This can be achieved either by running the program with root privileges (so sudo is your friend) or by putting
 ```
 SUBSYSTEM=="usb", ATTR{idVendor}=="16c0",ATTR{idProduct}=="05df", MODE="0666"
 KERNEL=="hidraw*", ATTRS{busnum}=="1", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="05df", MODE="0666"
 ```
 to `/etc/udev/rules.d/50-dct-tech-usb-relay-2.rules`.
 
+Usually hidraw busnum is set to 1, but it may change in some hardware configurations, such as virtual machines.
+Check the output of the `lsusb` command to get the right hidraw busnum.
+
 Running the program will display each module that matches device 16c0:05df the debug information is sent to stderr while the state is sent to stdout for use in scripts. The only limit to the number of these relays that can be plugged in and operated at once is the number of USB ports.
+
+The following examples run the program on a Linux shell with root privileges.
+If udev rules have been added, then you can omit the `sudo` prefix.
+
+On Mac OS X and Windows, it is not required to run the program with root privileges.
 ```
 $ sudo ./usbrelay
 Device Found

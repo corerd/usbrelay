@@ -16,15 +16,22 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+
+#ifdef _WIN32
+#include "stdafx.h"
+#include <windows.h>
+#include "strsep.h"
+#else
+#include <unistd.h>
+#endif
+
 #include <stdio.h>
 #include <wchar.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <unistd.h>
 #include <hidapi/hidapi.h>
 #include "usbrelay.h"
-
 
 
 int main( int argc, char *argv[]) {
@@ -42,6 +49,7 @@ int main( int argc, char *argv[]) {
    unsigned short vendor_id  = 0x16c0;
    unsigned short product_id = 0x05df;
    char *vendor, *product;
+   int ret;
 
    /* allocate the memeory for all the relays */
    if (argc > 1) {
@@ -105,7 +113,7 @@ int main( int argc, char *argv[]) {
          return 1;
       }
       buf[0] = 0x01;
-      int ret = hid_get_feature_report(handle,buf,sizeof(buf));
+      ret = hid_get_feature_report(handle,buf,sizeof(buf));
       if (ret == -1) {
               perror("hid_get_feature_report");
               exit(1);

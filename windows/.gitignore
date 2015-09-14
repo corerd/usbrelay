@@ -1,0 +1,17 @@
+Debug
+Release
+ipch
+*.exp
+*.ilk
+*.suo
+*.sdf
+*.opensdf
+*.vcxproj.*
+!*.vcxproj.filters
+*.ncb
+*.suo
+*.pdb
+.deps
+.libs
+*.lo
+*.la
