@@ -36,7 +36,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 int main( int argc, char *argv[]) {
    struct relay *relays = 0;
-   unsigned char buf[9];// 1 extra byte for the report ID
+   unsigned char feature_report[8];
    char arg_t[20] = {'\0'};
    int debug = 0;
    int num_relays = 2;
@@ -102,7 +102,7 @@ int main( int argc, char *argv[]) {
       fprintf(stderr,"  Product:      %ls\n", cur_dev->product_string);
       fprintf(stderr,"  Release:      %hx\n", cur_dev->release_number);
       fprintf(stderr,"  Interface:    %d\n",  cur_dev->interface_number);
-      
+
       // The product string is USBRelayx where x is number of relays read to the \0 in case there are more than 9
       num_relays = atoi((const char *)&cur_dev->product_string[8] );
       fprintf(stderr,"  Number of Relays = %d\n",num_relays);
@@ -112,29 +112,28 @@ int main( int argc, char *argv[]) {
          fprintf(stderr,"unable to open device\n");
          return 1;
       }
-      buf[0] = 0x01;
-      ret = hid_get_feature_report(handle,buf,sizeof(buf));
+
+      ret = get_feature_report_relay(handle, feature_report, sizeof(feature_report));
       if (ret == -1) {
               perror("hid_get_feature_report");
               exit(1);
       }
 
-
       if (debug) {
-        for ( i = 0; i < num_relays ; i++ ) {
-          if (buf[7] & 1 << i) {
-            printf("%s_%d=1\n",buf,i+1);
-          } else {
-            printf("%s_%d=0\n",buf,i+1); 
-	  }
-	}
+         for ( i = 0; i < num_relays ; i++ ) {
+            if (feature_report[7] & 1 << i) {
+               printf("%s_%d=1\n",feature_report,i+1);
+            } else {
+               printf("%s_%d=0\n",feature_report,i+1); 
+            }
+         }
       }
 
       /* loop through the supplied command line and try to match the serial */
       for (i=1;i<argc;i++) {
          fprintf(stderr,"Serial: %s, Relay: %d State: %x \n",relays[i].this_serial,relays[i].relay_num,relays[i].state);
-         if (!strcmp(relays[i].this_serial, (const char *) buf)) {
-            fprintf(stderr,"%d HID Serial: %s ", i, buf);
+         if (!strcmp(relays[i].this_serial, (const char *) feature_report)) {
+            fprintf(stderr,"%d HID Serial: %s ", i, feature_report);
             fprintf(stderr,"Serial: %s, Relay: %d State: %x\n",relays[i].this_serial,relays[i].relay_num,relays[i].state);
             operate_relay(handle,relays[i].relay_num,relays[i].state);
             relays[i].found = 1;
@@ -162,7 +161,24 @@ int main( int argc, char *argv[]) {
    exit(0);
 }
 
-int operate_relay(hid_device *handle,unsigned char relay, unsigned char state){
+void dump_feature_report(unsigned char *buf, int buf_len) {
+   int i;
+   char text;
+
+   // Print out the hid feature report buffer.
+   printf("Len of feature report; %d\n", buf_len);
+   printf("Content    Dec    Hex    Text\n");
+   for (i = 0; i < buf_len; i++)
+   {
+      if (isprint(buf[i]))
+         text = buf[i];
+      else
+         text = '.';
+      fprintf(stderr, "buf[%02d]     %02d    0x%02X     %c\n", i, buf[i], buf[i], text);
+   }
+}
+
+int operate_relay(hid_device *handle,unsigned char relay, unsigned char state) {
    unsigned char buf[9];// 1 extra byte for the report ID
    int res;
 
@@ -175,10 +191,45 @@ int operate_relay(hid_device *handle,unsigned char relay, unsigned char state){
    buf[6] = 0x00;
    buf[7] = 0x00;
    buf[8] = 0x00;
-   res = hid_write(handle, buf, sizeof(buf));
+   res = hid_send_feature_report(handle, buf, sizeof(buf));
    if (res < 0) {
       fprintf(stderr,"Unable to write()\n");
       fprintf(stderr,"Error: %ls\n", hid_error(handle));
+   }
+   return(res);
+}
+
+/**
+ * Get a feature report from a USB Relay device.
+ * 
+ * Set the first byte of data[] to the Report ID of the report to be read.
+ * Make sure to allow space for this extra byte in data[].
+ * Upon return, the first byte will still contain the Report ID,
+ * and the report data will start in data[1].
+ *
+ * There is a discrepancy in returned number of read bytes in hid_get_feature_report()
+ * In Mac OS X and Windows API there's a report ID every time.
+ * See: https://github.com/signal11/hidapi/issues/182
+ *
+ * In Linux the Report ID is present only when report number is set to 0.
+ *
+ * To be compliant with the different platforms,
+ * it is mandatory to set the report number to 0.
+ */
+int get_feature_report_relay(hid_device *handle, unsigned char *feature, size_t feature_len){
+   int res;
+   unsigned char data[9];// 1 extra byte for the report ID
+   
+   data[0] = 0x00; //report number
+   res = hid_get_feature_report(handle, data, sizeof(data));
+   if (res >= 0)
+   {
+      // skip extra byte for the report ID
+      memcpy(feature, &data[1], feature_len);
+
+#ifdef _DEBUG
+      dump_feature_report(data, res);
+#endif
    }
    return(res);
 }

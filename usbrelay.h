@@ -22,6 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define OFF 0xfd
 
 int operate_relay(hid_device *handle,unsigned char relay, unsigned char state);
+int get_feature_report_relay(hid_device *handle, unsigned char *feature, size_t feature_len);
 
 struct  relay {
 	char this_serial[10];
