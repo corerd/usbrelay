@@ -191,6 +191,12 @@ $ eval $(sudo ./usbrelay 2>/dev/null)
 $ echo $PSUIS_2
 0
 ```
+On Windows, to achieve the same result, use PowerShell
+```
+PS > Invoke-Expression ("$" + (usbrelay) 2> $null)
+PS > $PSUIS_2
+0
+```
 To set the relay state of 1 or more modules at once:
 ```
 $ sudo ./usbrelay PSUIS_2=0
