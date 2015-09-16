@@ -105,6 +105,7 @@ From the above link. follow the instructions to build the hidapi dll.
 
 For your convenience, you can find the hidapi library binaries in this repo
 in the `windows/hidapi` directory.
+You have to copy the hidapi.dll in the usbrelay.exe program directory.
 
 
 Linux
@@ -150,6 +151,8 @@ Usage
 
 As already stated, the program is command line only.
 
+On Windows, PowerShell is recommended instead of the old DOS style Command Prompt.
+
 On Linux, the code needs to access the device. This can be achieved either by running the program with root privileges (so sudo is your friend) or by putting
 ```
 SUBSYSTEM=="usb", ATTR{idVendor}=="16c0",ATTR{idProduct}=="05df", MODE="0666"
@@ -160,14 +163,22 @@ to `/etc/udev/rules.d/50-dct-tech-usb-relay-2.rules`.
 Usually hidraw busnum is set to 1, but it may change in some hardware configurations, such as virtual machines.
 Check the output of the `lsusb` command to get the right hidraw busnum.
 
-Running the program will display each module that matches device 16c0:05df the debug information is sent to stderr while the state is sent to stdout for use in scripts. The only limit to the number of these relays that can be plugged in and operated at once is the number of USB ports.
-
-The following examples run the program on a Linux shell with root privileges.
-If udev rules have been added, then you can omit the `sudo` prefix.
-
 On Mac OS X and Windows, it is not required to run the program with root privileges.
+
+Running the program will display each module that matches device 16c0:05df. The debug information is sent to stderr while the state is sent to stdout for use in scripts. The only limit to the number of these relays that can be plugged in and operated at once is the number of USB ports.
+
+### To display the debug information and relay state
+
+On Linux and Mac OS X:
 ```
-$ sudo ./usbrelay
+$ [sudo] ./usbrelay
+```
+On Windows Command Prompt and PowerShell:
+```
+> usbrelay
+```
+Result:
+```
 Device Found
   type: 16c0 05df
   path: /dev/hidraw1
@@ -179,33 +190,60 @@ Device Found
 PSUIS_1=1
 PSUIS_2=0
 ```
-To get the relay state
+
+### To get the relay state only
+On Linux and Mac OS X:
 ```
-$ sudo ./usbrelay 2>/dev/null
+$ [sudo] ./usbrelay 2>/dev/null
+```
+On Windows Command Prompt:
+```
+> usbrelay 2> NUL
+```
+On Windows PowerShell:
+```
+> usbrelay 2> $null
+```
+Result:
+```
 PSUIS_1=1
 PSUIS_2=0
 ```
-To use the state in a script:
+
+### To use the state in a script:
+On Linux and Mac OS X:
 ```
-$ eval $(sudo ./usbrelay 2>/dev/null)
+$ eval $([sudo] ./usbrelay 2>/dev/null)
 $ echo $PSUIS_2
 0
 ```
-On Windows, to achieve the same result, use PowerShell
+On Windows, you can achieve the same result only using PowerShell:
 ```
-PS > Invoke-Expression ("$" + (usbrelay) 2> $null)
-PS > $PSUIS_2
+> Invoke-Expression ("$" + (usbrelay) 2> $null)
+> $PSUIS_2
 0
 ```
-To set the relay state of 1 or more modules at once:
+
+### To set the relay state of 1 or more modules at once:
+On Linux and Mac OS X:
 ```
-$ sudo ./usbrelay PSUIS_2=0
-$ sudo ./usbrelay PSUIS_2=1 PSUIS_1=0
-$ sudo ./usbrelay PSUIS_2=0 PSUIS_1=1 0U70M_1=0 0U70M_2=1
+$ [sudo] ./usbrelay PSUIS_2=0
+$ [sudo] ./usbrelay PSUIS_2=1 PSUIS_1=0
+$ [sudo] ./usbrelay PSUIS_2=0 PSUIS_1=1 0U70M_1=0 0U70M_2=1
 ```
-If for some reason the USB id changes, (ie other than 16c0:05df) set the USBID environment variable to the correct ID
+On Windows Command Prompt and PowerShell:
 ```
-$sudo USBID=16c0:05df ./usbrelay
+> usbrelay PSUIS_2=0
+> usbrelay PSUIS_2=1 PSUIS_1=0
+> usbrelay PSUIS_2=0 PSUIS_1=1 0U70M_1=0 0U70M_2=1
+```
+
+### To change the USBID environment variable
+If for some reason the USB id changes, (ie other than 16c0:05df) set the USBID environment variable to the correct ID.
+
+On Linux and Mac OS X:
+```
+$ [sudo] USBID=16c0:05df ./usbrelay
 ```
 
 Enjoy
