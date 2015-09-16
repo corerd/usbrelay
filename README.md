@@ -210,21 +210,22 @@ PSUIS_1=1
 PSUIS_2=0
 ```
 
-### To use the state in a script:
+### To use the state in a script
 On Linux and Mac OS X:
 ```
 $ eval $([sudo] ./usbrelay 2>/dev/null)
 $ echo $PSUIS_2
 0
 ```
-On Windows, you can achieve the same result only using PowerShell:
+On Windows Command Prompt there isn't an equivalent of Linux shell eval() function.
+Instead, use Windows PowerShell:
 ```
 > Invoke-Expression ("$" + (usbrelay) 2> $null)
 > $PSUIS_2
 0
 ```
 
-### To set the relay state of 1 or more modules at once:
+### To set the relay state of 1 or more modules at once
 On Linux and Mac OS X:
 ```
 $ [sudo] ./usbrelay PSUIS_2=0
@@ -244,6 +245,16 @@ If for some reason the USB id changes, (ie other than 16c0:05df) set the USBID e
 On Linux and Mac OS X:
 ```
 $ [sudo] USBID=16c0:05df ./usbrelay
+```
+On Windows Command Prompt (make sure your spacing is exactly as shown below):
+```
+> set USBID=16c0:05df
+> usbrelay
+```
+On Windows PowerShell:
+```
+> $env:USBID = "16c0:05df"
+> usbrelay
 ```
 
 Enjoy
