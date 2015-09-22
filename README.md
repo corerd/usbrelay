@@ -7,8 +7,9 @@ A cheap USB relay available from Ebay has either single or dual relay output.
 The double throw relay ratings are 10A 250VAC each.
 
 The USB device is HID compatible and comes with Windows control software.
-This code can control the relay vi HIDAPI which is a cross platform library. 
-This code was tested under linux both on x86 and Raspberry Pi ARM.
+This code can control the relay via HIDAPI which is a cross platform library. 
+This code was tested under Linux both on x86 and Raspberry Pi ARM, Mac OS X 10.9 Mavericks
+and Windows both 7 and 8.1.
 The program is command line only as it is likely to be used by shell scripts.
 
 The output of lsusb for the device is:
@@ -76,48 +77,48 @@ Device Descriptor:
 Device Status:     0x0000
   (Bus Powered)
 ```
-HIDAPI
-======
+Build Instructions
+===================
 
-http://www.signal11.us/oss/hidapi
-
-HIDAPI is a fairly recent addition to linux and is available as a package for Fedora 20 but not for Pidora (F18). 
-The package was built for Pidora (Fedora 18) using the F20 hidapi source package.
-
+Prerequisite
+-------------
+### The [HIDAPI!](http://www.signal11.us/oss/hidapi) library
+You will need to install the development packages if available, or compile the sources by yourself.
+The source code can be checked in from the official repository:
+```
+git clone https://github.com/signal11/hidapi
+```
 Protocol:
 The relay modules does not set the USB serial number but has a unique serial when the HID device is queried, the current state of the relays is also sent with the serial.
 The HID serial is matched and the ON/OFF command is sent to the chosen relay.
 
-
-Build Instructions
-===================
-
-Prerequisites
--------------
-
-You will need to install development packages for libhidapi.
-
-On Windows, checkout hidapi sources from the official repository:
-
-https://github.com/signal11/hidapi
-
-From the above link. follow the instructions to build the hidapi dll.
-
-For your convenience, you can find the hidapi library binaries in this repo
-in the `windows/hidapi` directory.
-You have to copy the hidapi.dll in the usbrelay.exe program directory.
-
-
-Linux
------
+#### HIDAPI on Linux
+HIDAPI is a fairly recent addition to Linux and is available as a package for Fedora 20 but not for Pidora (F18). 
+The package was built for Pidora (Fedora 18) using the F20 hidapi source package.
 
 On Debian/Ubuntu systems, development packages for libhidapi can be installed by running:
 ```
 sudo apt-get install libhidapi-dev libhidapi-hidraw0 libhidapi-libusb0
 ```
 
-There are two options for the hidapi library: hidapi-hidraw or hidapi-libusb. Different distributions have better results with one or the other. YMMV.
+#### HIDAPI on Mac OS X
+The development packages for libhidapi can be installed by running:
+```
+sudo brew install hidapi
+```
 
+#### HIDAPI on Windows
+You have to build the hidapi dll from the source code following the instructions
+from this [link!](https://github.com/signal11/hidapi).
+
+For your convenience, you can find the Windows x86 hidapi library binaries
+in the `windows/hidapi` directory of this repository.
+You have to copy the hidapi.dll in the usbrelay.exe program directory.
+
+
+Build usbrelay on Linux
+-----------------------
+There are two options for the hidapi library: hidapi-hidraw or hidapi-libusb. Different distributions have better results with one or the other. YMMV.
 ```
 ### hidapi-hidraw 
 # gcc -o usbrelay usbrelay.c -lhidapi-hidraw
@@ -126,23 +127,16 @@ There are two options for the hidapi library: hidapi-hidraw or hidapi-libusb. Di
 ```
 
 
-Mac OS X
---------
-
-On Mac OS X, development packages for libhidapi can be installed by running:
-```
-sudo brew install hidapi
-```
-
+Build usbrelay on Mac OS X
+--------------------------
 Compile the program entering the following command:
 ```
 # gcc -o usbrelay usbrelay.c -lhidapi
 ```
 
 
-Windows
--------
-
+Build usbrelay on Windows
+-------------------------
 Use Visual Studio to build the .sln file in the `windows/usbrelay-vs` directory.
 
 
