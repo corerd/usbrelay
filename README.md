@@ -82,7 +82,7 @@ Build Instructions
 
 Prerequisite
 -------------
-### The [HIDAPI!](http://www.signal11.us/oss/hidapi) library
+### The [HIDAPI](http://www.signal11.us/oss/hidapi) library
 You will need to install the development packages if available, or compile the sources by yourself.
 The source code can be checked in from the official repository:
 ```
@@ -108,8 +108,8 @@ sudo brew install hidapi
 ```
 
 #### HIDAPI on Windows
-You have to build the hidapi dll from the source code following the instructions
-from this [link!](https://github.com/signal11/hidapi).
+You have to build the `hidapi.dll` from the source code following the instructions
+from this [link](https://github.com/signal11/hidapi).
 
 For your convenience, you can find the Windows x86 hidapi library binaries
 in the `windows/hidapi` directory of this repository.
