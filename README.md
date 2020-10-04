@@ -11,7 +11,7 @@ The controller is fully powered from the USB bus, each relay rating 10A/250VAC,
 This controller connects to a PC's USB port using HID (Human Interface Device)
 class.
 
-In Linux, knowing the vendor and product ID (16c0:05df in this sample),
+On Linux, knowing the vendor and product ID (16c0:05df in this sample),
 you can use the `lsusb` utility to display information about your controller.  
 Open a Terminal window and enter the command:
 ```
@@ -134,16 +134,31 @@ from this [link](https://github.com/signal11/hidapi).
 
 For your convenience, you can find the Windows x86 hidapi library binaries
 in the `windows/hidapi` directory of this repository.
-You have to copy the hidapi.dll in the usbrelay.exe program directory.
+You have to copy the `hidapi.dll` in the `usbrelay.exe` program directory.
 
 
 Build usbrelay on Linux
 -----------------------
-There are two options for the hidapi library: hidapi-hidraw or hidapi-libusb. Different distributions have better results with one or the other. YMMV.
+Two back-end can be used: either the hidraw or the libusb.
+
+### Linux/hidraw (linux/hid.c)
+This back-end uses the hidraw interface in the Linux kernel, and supports both
+USB and Bluetooth HID devices. It requires kernel version at least 2.6.39.
+In addition, it will only communicate with devices which have hidraw nodes
+associated with them. Keyboards, mice, and some other devices which are
+blacklisted from having hidraw nodes will not work.
+
+Enter the following command to make `usbrelay` linking hidraw library:
 ```
-### hidapi-hidraw 
 # gcc -o usbrelay usbrelay.c -lhidapi-hidraw
-### hidapi-libusb
+```
+
+### Linux/FreeBSD/libusb (libusb/hid.c)
+This back-end uses libusb-1.0 to communicate directly to a USB device.
+This back-end will of course not work with Bluetooth devices.
+
+Enter the following command to make `usbrelay` linking libusb library:
+```
 # gcc -o usbrelay usbrelay.c -lhidapi-libusb
 ```
 
