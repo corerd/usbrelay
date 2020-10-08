@@ -130,7 +130,7 @@ sudo brew install hidapi
 
 #### HIDAPI on Windows
 You have to build the `hidapi.dll` from the source code following the instructions
-from this [link](https://github.com/signal11/hidapi).
+from this [link](https://github.com/libusb/hidapi).
 
 For your convenience, you can find the Windows x86 hidapi library binaries
 in the `windows/hidapi` directory of this repository.
