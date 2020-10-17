@@ -5,6 +5,7 @@
 
 TARGET = usbrelay
 HIDAPILIB = hidapi-hidraw
+#HIDAPILIB = hidapi-libusb
 INSTALLDIR = /usr/local/bin
 
 CC = gcc
