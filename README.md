@@ -1,23 +1,24 @@
+USB Relay Controller for Linux, Mac OS X and Windows
+====================================================
+
+In the most popular e-commerce sites are available cheap USB Relay Controllers,
+single or multi channel like the one in the picture below.  
+The controller is fully powered from the USB bus, each relay rating 10A/250VAC,
+10A/30VDC.
+
 ![alt text](usbrelay.jpg "USB Relay")
 
-USB Relay driver for Linux, Mac OS X and Windows
-================================================
+This controller connects to a PC's USB port using HID (Human Interface Device)
+class.
 
-A cheap USB relay available from Ebay has either single or dual relay output.
-The double throw relay ratings are 10A 250VAC each.
-
-The USB device is HID compatible and comes with Windows control software.
-This code can control the relay via HIDAPI which is a cross platform library. 
-This code was tested under Linux both on x86 and Raspberry Pi ARM, Mac OS X 10.9 Mavericks
-and Windows both 7 and 8.1.
-The program is command line only as it is likely to be used by shell scripts.
-
-The output of lsusb for the device is:
+On Linux, knowing the vendor and product ID (16c0:05df in this sample),
+you can use the `lsusb` utility to display information about your controller.  
+Open a Terminal window and enter the command:
 ```
-Bus 001 Device 003: ID 16c0:05df Van Ooijen Technische Informatica HID device except mice, keyboards, and joysticks
-
 # lsusb -v -d 16c0:05df 
-
+```
+The output should be like the following:
+```
 Bus 001 Device 003: ID 16c0:05df Van Ooijen Technische Informatica HID device except mice, keyboards, and joysticks
 Device Descriptor:
   bLength                18
@@ -77,26 +78,46 @@ Device Descriptor:
 Device Status:     0x0000
   (Bus Powered)
 ```
+
+
+usbrelay
+========
+A command line utility for controlling the relays connected to a PC's USB port.
+
+This code was tested under Linux both on x86 and Raspberry Pi ARM, Mac OS X 10.9
+Mavericks and Windows both 7 and 8.1.
+
+
 Build Instructions
 ===================
 
 Prerequisite
 -------------
-### The [HIDAPI](http://www.signal11.us/oss/hidapi) library
-You will need to install the development packages if available, or compile the sources by yourself.
-The source code can be checked in from the official repository:
+### The [HIDAPI](https://github.com/libusb/hidapi) library
+HIDAPI is a multi-platform library which allows an application to interface
+with USB and Bluetooth HID-Class devices on Windows, Linux, FreeBSD, and macOS.
+
+HIDAPI library was originally developed by Alan Ott
+([signal11](https://github.com/signal11)).
+
+It was moved to [libusb/hidapi](https://github.com/libusb/hidapi) 
+on June 4th, 2019, in order to merge important bugfixes and continue development
+of the library.
+
+You will need to install the development packages if available, or compile the
+sources by yourself checking out from the official repository:
 ```
-git clone https://github.com/signal11/hidapi
+git clone https://github.com/libusb/hidapi.git
 ```
 Protocol:
-The relay modules does not set the USB serial number but has a unique serial when the HID device is queried, the current state of the relays is also sent with the serial.
+The relay modules does not set the USB serial number but has a unique serial.
+When the HID device is queried, the current state of the relays is also sent
+with the serial.
 The HID serial is matched and the ON/OFF command is sent to the chosen relay.
 
 #### HIDAPI on Linux
-HIDAPI is a fairly recent addition to Linux and is available as a package for Fedora 20 but not for Pidora (F18). 
-The package was built for Pidora (Fedora 18) using the F20 hidapi source package.
-
-On Debian/Ubuntu systems, development packages for libhidapi can be installed by running:
+On Debian/Ubuntu systems, development packages for libhidapi can be installed
+entering the command:
 ```
 sudo apt-get install libhidapi-dev libhidapi-hidraw0 libhidapi-libusb0
 ```
@@ -109,20 +130,35 @@ sudo brew install hidapi
 
 #### HIDAPI on Windows
 You have to build the `hidapi.dll` from the source code following the instructions
-from this [link](https://github.com/signal11/hidapi).
+from this [link](https://github.com/libusb/hidapi).
 
 For your convenience, you can find the Windows x86 hidapi library binaries
 in the `windows/hidapi` directory of this repository.
-You have to copy the hidapi.dll in the usbrelay.exe program directory.
+You have to copy the `hidapi.dll` in the `usbrelay.exe` program directory.
 
 
 Build usbrelay on Linux
 -----------------------
-There are two options for the hidapi library: hidapi-hidraw or hidapi-libusb. Different distributions have better results with one or the other. YMMV.
+Two back-end can be used: either the hidraw or the libusb.
+
+### Linux/hidraw (linux/hid.c)
+This back-end uses the hidraw interface in the Linux kernel, and supports both
+USB and Bluetooth HID devices. It requires kernel version at least 2.6.39.
+In addition, it will only communicate with devices which have hidraw nodes
+associated with them. Keyboards, mice, and some other devices which are
+blacklisted from having hidraw nodes will not work.
+
+Enter the following command to make `usbrelay` linking hidraw library:
 ```
-### hidapi-hidraw 
 # gcc -o usbrelay usbrelay.c -lhidapi-hidraw
-### hidapi-libusb
+```
+
+### Linux/FreeBSD/libusb (libusb/hid.c)
+This back-end uses libusb-1.0 to communicate directly to a USB device.
+This back-end will of course not work with Bluetooth devices.
+
+Enter the following command to make `usbrelay` linking libusb library:
+```
 # gcc -o usbrelay usbrelay.c -lhidapi-libusb
 ```
 
