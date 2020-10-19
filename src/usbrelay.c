@@ -30,7 +30,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "usbrelay.h"
 
 
