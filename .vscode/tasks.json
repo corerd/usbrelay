@@ -1,0 +1,65 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        // Configure CMake build system for Windows
+        // using Microsoft Visual C++ tools chain
+        {
+            "label": "Config win-msvc",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                // Generator choice: Microsoft Visual C++ Makefiles
+                "-G",
+                "NMake Makefiles",
+                // Use -S and -B options to specify source and build tree root
+                // paths relative to VS Code ${workspaceRoot}:
+                "-S.",
+                "-Bplatforms/Windows/build-msvc",
+                // Executable output sub directory of build tree root:
+                "-DCMAKE_BUILD_TYPE=Release"
+            ]
+        },
+        // Build using Microsoft Visual C++ tools chain
+        {
+            "label": "Build win-msvc",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/platforms/Windows/build-msvc"
+            },
+            "command": "nmake"
+        },
+
+        // Configure CMake build system for Windows
+        // using MinGW tools chain
+        {
+            "label": "Config win-mingw",
+            "type": "shell",
+            "command": "cmake",
+            // Use -S and -B options to specify source and build directory
+            // Define CMAKE_BUILD_TYPE variable because makefiles generated
+            // by CMake are single-configuration
+            "args": [
+                // Generator choice: MinGW Makefiles
+                "-G",
+                "MSYS Makefiles",
+                // Use -S and -B options to specify source and build tree root
+                // paths relative to VS Code ${workspaceRoot}:
+                "-S.",
+                "-Bplatforms/Windows/build-mingw",
+                // Executable output sub directory of build tree root:
+                "-DCMAKE_BUILD_TYPE=Release"
+            ]
+        },
+        // Build using MinGW tools chain
+        {
+            "label": "Build win-mingw",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/platforms/Windows/build-mingw"
+            },
+            "command": "make"
+        }
+    ]
+}
