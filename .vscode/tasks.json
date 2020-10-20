@@ -3,6 +3,66 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
+        // Configure CMake build system for Linux
+        // using hidraw HIDAPI back-end
+        {
+            "label": "Config Linux/hidraw",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                // HIDAPI back-end
+                "-DHIDAPI_BACKEND=hidraw",
+                // Generator choice: GNU Makefiles
+                "-G",
+                "Unix Makefiles",
+                // Use -S and -B options to specify source and build tree root
+                // paths relative to VS Code ${workspaceRoot}:
+                "-S.",
+                "-Bplatforms/Linux/build-hidraw",
+                // Executable output sub directory of build tree root:
+                "-DCMAKE_BUILD_TYPE=Release"
+            ]
+        },
+        // Build using hidraw HIDAPI back-end
+        {
+            "label": "Build Linux/hidraw",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/platforms/Linux/build-hidraw"
+            },
+            "command": "make"
+        },
+
+        // Configure CMake build system for Linux
+        // using libusb HIDAPI back-end
+        {
+            "label": "Config Linux/libusb",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                // HIDAPI back-end
+                "-DHIDAPI_BACKEND=libusb",
+                // Generator choice: GNU Makefiles
+                "-G",
+                "Unix Makefiles",
+                // Use -S and -B options to specify source and build tree root
+                // paths relative to VS Code ${workspaceRoot}:
+                "-S.",
+                "-Bplatforms/Linux/build-libusb",
+                // Executable output sub directory of build tree root:
+                "-DCMAKE_BUILD_TYPE=Release"
+            ]
+        },
+        // Build using libusb HIDAPI back-end
+        {
+            "label": "Build Linux/libusb",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/platforms/Linux/build-libusb"
+            },
+            "command": "make"
+        },
+
         // Configure CMake build system for Windows
         // using Microsoft Visual C++ tools chain
         {
