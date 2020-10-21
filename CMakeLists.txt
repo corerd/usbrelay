@@ -45,7 +45,7 @@ else()
 endif()
 
 # HIDAPI platform specific sources
-set(HIDAPI_EXTRAS ${PLATFORM_DIR}/hidapi)
+set(HIDAPI_SRC_ROOT ${PLATFORM_DIR})
 
 # The paths to the includes and sources files directories are relative to
 # the source tree root.
@@ -56,7 +56,7 @@ set(HIDAPI_EXTRAS ${PLATFORM_DIR}/hidapi)
 include_directories(
     src 
     ${PLATFORM_DIR}/src
-    ${HIDAPI_EXTRAS}
+    ${HIDAPI_SRC_ROOT}
 )
 
 file(
@@ -64,7 +64,7 @@ file(
     SOURCES
     src/*
     ${PLATFORM_DIR}/src/*
-    ${HIDAPI_EXTRAS}/*
+    ${HIDAPI_SRC_ROOT}/hidapi/*
 )
 
 # By default, the current working directory, that is where cmake is called,
